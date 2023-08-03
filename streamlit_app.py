@@ -37,18 +37,23 @@ try:
 except URLError as e:
   st.error()
 
+st.header("The fruit load list from contains:")
+# Snowflake-related functions
+def get_fruit_load_list():
+  with my_cnx.cursor() as my_cur:
+    my_cur.execute("select * from pc_rivery_db.public.fruit_load_list")
+    return my_cur.fetchall()
+
+# Add a button to load the fruit
+if st.button("Get Fruit Load List"):
+  my_cnx = snowflake.connector.connect(**st.secrets["snowflake"])
+  my_data_rows = get_fruit_load_list()
+  st.dataframe(my_data_rows)
 
 st.stop()
 
-my_cnx = snowflake.connector.connect(**st.secrets["snowflake"])
-my_cur = my_cnx.cursor()
-my_cur.execute("select * from pc_rivery_db.public.fruit_load_list")
-my_data_rows = my_cur.fetchall()
-st.header("The fruit load list from contains:")
-st.dataframe(my_data_rows)
-
 # Allow the end user to add a fruit to the list
-add_my_fruit = st.text_input("What fruit would you like to add?", "jackfruit")
+add_my_fruit = st.text_input("What fruit would you like to add?")
 st.write("Thanks for adding ", add_my_fruit)
 
 my_cur.execute("insert into pc_rivery_db.public.fruit_load_list (fruit_name) values ('" + add_my_fruit + "')")
